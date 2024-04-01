@@ -1,8 +1,8 @@
 from tkinter import ttk
 import tkinter as tk
-from Utils import *
 
 class AppPanel:
+
     def __init__(self, master):
         self.master = master
         self.master.title("SchrodingerSat")
