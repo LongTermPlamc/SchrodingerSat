@@ -44,8 +44,23 @@ class AppPanel:
         self.timeRefresh()
 
         ##Start-Stop-Save panel
-        zone3 = tk.Frame(self.frame, bg="lightblue",width=180,height=250)
+        zone3 = tk.Frame(self.frame, bg="lightblue",width=120,height=250)
         zone3.pack(expand=False, anchor="nw", fill="none", padx=5, pady = 5)
+
+        trialName = tk.Label(zone3, text="Trial Panel")
+        trialName.pack(anchor="nw",padx = 10, pady=5, ipady=5)
+
+        zone31 = tk.Frame(zone3,bg = "lightblue",width=10,height=100)
+        zone31.pack(side="left", padx=10, pady=5)
+        self.startButton = tk.Button(zone31,text="Start",fg="black",width=22,command=self.startMeasure)
+        self.startButton.pack(side="top",padx=10,ipadx=10, pady=5, ipady=5)
+        self.stopButton = tk.Button(zone31,text="Stop",fg="black",width=22,command=self.stopMeasure)
+        self.stopButton.pack(side="left",padx=5,ipadx=10,pady=5, ipady=5)
+
+        zone32 = tk.Frame(zone3,bg = "lightblue",width=10,height=100)
+        zone32.pack(side="top", padx=10, pady=5)
+        self.connectButton = tk.Button(zone31,text="Save Data",fg="black",width=22,command=self.saveData)
+        self.connectButton.pack(side="left",padx=10,ipadx=10, pady=5, ipady=5)
         
 
     def connect(self):
@@ -79,6 +94,15 @@ class AppPanel:
             self.connectionTime.config(text = "00:00:00")
         
         self.master.after(1000, self.timeRefresh)
+
+    def startMeasure(self):
+        return 0
+    
+    def stopMeasure(self):
+        return 0
+    
+    def saveData(self):
+        return 0
 
         
 
