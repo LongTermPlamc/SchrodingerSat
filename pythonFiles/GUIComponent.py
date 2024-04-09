@@ -3,11 +3,14 @@ import tkinter as tk
 import time
 from PIL import Image, ImageTk
 
+import SerialComponent
+
 class AppPanel():
 
 
     serialConnect = False
     connectTimeStart = 0
+    serial = SerialComponent.customSerial()
 
     
     def __init__(self,master):
@@ -25,13 +28,13 @@ class AppPanel():
         self.connectionPanel.grid(row=0,column=0,sticky="nsew")
         self.connectionPanelName = tk.Label(self.connectionPanel, text="Serial Connection Panel")
         self.connectionPanelName.grid(row=0,column=0,sticky="nsew")
-        self.comPortSelector = ttk.Combobox(self.connectionPanel, values=[1, 2, 3, 4])
+        self.comPortSelector = ttk.Combobox(self.connectionPanel, values=self.serial.portList)
         self.comPortSelector.grid(row=1,column=0,sticky="nsew")
-        self.comBaudSelector = ttk.Combobox(self.connectionPanel, values=[1, 2, 3, 4])
+        self.comBaudSelector = ttk.Combobox(self.connectionPanel, values=self.serial.baudRateList)
         self.comBaudSelector.grid(row=2,column=0,sticky="nsew")
         self.comButtonPanel = tk.Frame(self.connectionPanel)
         self.comButtonPanel.grid(row=3,column=0,sticky="nsew")
-        self.connectButton = tk.Button(self.comButtonPanel, text="Connect", fg="black", command=self.connect)
+        self.connectButton = tk.Button(self.comButtonPanel, text="Connect", fg="black", command=self.connect,state = tk.NORMAL)
         self.connectButton.grid(row=0,column=0,sticky="nsew")
         self.disconnectButton = tk.Button(self.comButtonPanel, text="Disconnect", fg="black", command=self.disconnect, state=tk.DISABLED)
         self.disconnectButton.grid(row=0,column=1,sticky="nsew")
@@ -60,11 +63,11 @@ class AppPanel():
         self.saveButton = tk.Button(self.trialPanel, text="Save Data", fg="black")
         self.saveButton.grid(row=2,column=0,sticky="nsew")
 
-        self.positionImage = Image.open("C:\\Users\\Wolfram\\Downloads\\img_matplotlib_plotting4.png").resize((780,300))
+        self.positionImage = Image.open(".\\pythonFiles\\wildcardImage.png").resize((780,300))
         self.positionImage = ImageTk.PhotoImage(self.positionImage)
-        self.velocityImage = Image.open("C:\\Users\\Wolfram\\Downloads\\img_matplotlib_plotting4.png").resize((780,300))
+        self.velocityImage = Image.open(".\\pythonFiles\\wildcardImage.png").resize((780,300))
         self.velocityImage = ImageTk.PhotoImage(self.velocityImage)
-        self.accelerationImage =Image.open("C:\\Users\\Wolfram\\Downloads\\img_matplotlib_plotting4.png").resize((780,300))
+        self.accelerationImage =Image.open(".\\pythonFiles\\wildcardImage.png").resize((780,300))
         self.accelerationImage =ImageTk.PhotoImage(self.accelerationImage)
 
         self.motionVarPanel = tk.Frame(self.frame,padx=5,pady=5, highlightbackground="blue", highlightthickness=2)
@@ -83,7 +86,7 @@ class AppPanel():
         self.gyroAndTermoPanel = tk.Frame(self.frame,padx=5,pady=5, highlightbackground="blue", highlightthickness=2)
         self.gyroAndTermoPanel.grid(row=0,column =2,sticky="nsew")
 
-        self.gyroscopeImage =Image.open("C:\\Users\\Wolfram\\Downloads\\img_matplotlib_plotting4.png").resize((620,300))
+        self.gyroscopeImage =Image.open(".\\pythonFiles\\wildcardImage.png").resize((620,300))
         self.gyroscopeImage =ImageTk.PhotoImage(self.gyroscopeImage)
 
         self.gyroPanel = tk.Frame(self.gyroAndTermoPanel)
@@ -93,9 +96,9 @@ class AppPanel():
         self.gyroPlot = tk.Label(self.gyroPanel, image=self.gyroscopeImage)
         self.gyroPlot.grid(row=1, column=0,sticky="nsew")
 
-        self.temperatureImage =Image.open("C:\\Users\\Wolfram\\Downloads\\img_matplotlib_plotting4.png").resize((620,300))
+        self.temperatureImage =Image.open(".\\pythonFiles\\wildcardImage.png").resize((620,300))
         self.temperatureImage =ImageTk.PhotoImage(self.temperatureImage)
-        self.pressureImage =Image.open("C:\\Users\\Wolfram\\Downloads\\img_matplotlib_plotting4.png").resize((620,300))
+        self.pressureImage =Image.open(".\\pythonFiles\\wildcardImage.png").resize((620,300))
         self.pressureImage =ImageTk.PhotoImage(self.pressureImage)
 
         self.termoPanel =tk.Frame(self.gyroAndTermoPanel)
@@ -243,6 +246,15 @@ class AppPanel():
     def connect(self):
         self.connectButton.config(state=tk.DISABLED)
         self.disconnectButton.config(state=tk.NORMAL)
+
+        localPort =  self.comPortSelector.get()
+        localBaud = int(self.comBaudSelector.get())
+
+        print(localPort)
+        print(localBaud)
+
+        self.serial.connect(port =localPort, baudrate=localBaud)
+        
         self.serialConnect = True
 
         self.connectTimeStart = time.time()
