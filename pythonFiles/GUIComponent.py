@@ -2,16 +2,16 @@ from tkinter import ttk
 import tkinter as tk
 import time
 from PIL import Image, ImageTk
+from individualTkModules.SerialPanel import SerialPanel
+import backend
+import serial
 
 import SerialComponent
 
 class AppPanel():
 
-
-    serialConnect = False
-    connectTimeStart = 0
-    serial = SerialComponent.customSerial()
-
+    back = backend.Backend()
+    ## Dataset para hacer store de todos los datos
     
     def __init__(self,master):
         self.master = master
@@ -28,18 +28,20 @@ class AppPanel():
         self.connectionPanel.grid(row=0,column=0,sticky="nsew")
         self.connectionPanelName = tk.Label(self.connectionPanel, text="Serial Connection Panel")
         self.connectionPanelName.grid(row=0,column=0,sticky="nsew")
-        self.comPortSelector = ttk.Combobox(self.connectionPanel, values=self.serial.portList)
+        self.comPortSelector = ttk.Combobox(self.connectionPanel,state="readonly", values=self.back.availablePorts)
+        self.comPortSelector.current(4)
         self.comPortSelector.grid(row=1,column=0,sticky="nsew")
-        self.comBaudSelector = ttk.Combobox(self.connectionPanel, values=self.serial.baudRateList)
+        self.comBaudSelector = ttk.Combobox(self.connectionPanel, state="readonly",values=self.back.availableBauds)
+        self.comBaudSelector.current(0)
         self.comBaudSelector.grid(row=2,column=0,sticky="nsew")
         self.comButtonPanel = tk.Frame(self.connectionPanel)
         self.comButtonPanel.grid(row=3,column=0,sticky="nsew")
-        self.connectButton = tk.Button(self.comButtonPanel, text="Connect", fg="black", command=self.connect,state = tk.NORMAL)
+        self.connectButton = tk.Button(self.comButtonPanel, text="Connect",command=self.connect, fg="black", state = tk.NORMAL)
         self.connectButton.grid(row=0,column=0,sticky="nsew")
-        self.disconnectButton = tk.Button(self.comButtonPanel, text="Disconnect", fg="black", command=self.disconnect, state=tk.DISABLED)
+        self.disconnectButton = tk.Button(self.comButtonPanel, text="Disconnect",command=self.disconnect, fg="black", state=tk.DISABLED)
         self.disconnectButton.grid(row=0,column=1,sticky="nsew")
 
-        self.timePanel = tk.Frame(self.controlPanel)
+        """self.timePanel = tk.Frame(self.controlPanel)
         self.timePanel.grid(row=1, column =0,sticky="nsew")
         self.timePanelName = tk.Label(self.timePanel, text="Timing")
         self.timePanelName.grid(row=0,column=0,sticky="nsew")
@@ -47,7 +49,7 @@ class AppPanel():
         self.mainClock.grid(row =1, column=0,sticky="nsew")
         self.connectionClock = tk.Label(self.timePanel, text="00:00:00", font=("Helvetica", 48))
         self.connectionClock.grid(row =2, column=0,sticky="nsew")
-        self.timeRefresh()
+        self.timeRefresh()"""
 
 
         self.trialPanel = tk.Frame(self.controlPanel)
@@ -56,14 +58,14 @@ class AppPanel():
         self.trialPanelName.grid(row=0,column=0,sticky="nsew")
         self.startStopFrame = tk.Frame(self.trialPanel)
         self.startStopFrame.grid(row=1,column=0,sticky="nsew")
-        self.startButton = tk.Button(self.startStopFrame, text="Start", fg="black")
+        self.startButton = tk.Button(self.startStopFrame, text="Start", command=self.startReading, fg="black", state = tk.DISABLED)
         self.startButton.grid(row=0,column=0,sticky="nsew")
-        self.stopButton = tk.Button(self.startStopFrame, text="Stop", fg="black")
+        self.stopButton = tk.Button(self.startStopFrame, text="Stop", command=self.stopReading, fg="black",state = tk.DISABLED)
         self.stopButton.grid(row=0,column=1,sticky="nsew")
-        self.saveButton = tk.Button(self.trialPanel, text="Save Data", fg="black")
+        self.saveButton = tk.Button(self.trialPanel, text="Save Data",command=self.saveData, fg="black",state = tk.DISABLED)
         self.saveButton.grid(row=2,column=0,sticky="nsew")
 
-        self.positionImage = Image.open(".\\pythonFiles\\wildcardImage.png").resize((780,300))
+        """self.positionImage = Image.open(".\\pythonFiles\\wildcardImage.png").resize((780,300))
         self.positionImage = ImageTk.PhotoImage(self.positionImage)
         self.velocityImage = Image.open(".\\pythonFiles\\wildcardImage.png").resize((780,300))
         self.velocityImage = ImageTk.PhotoImage(self.velocityImage)
@@ -110,7 +112,7 @@ class AppPanel():
         self.temperaturePlot = tk.Label(self.termoPlotFrame, image=self.temperatureImage)
         self.temperaturePlot.grid(row=0, column=0,sticky="nsew")
         self.pressurePlot = tk.Label(self.termoPlotFrame, image=self.pressureImage)
-        self.pressurePlot.grid(row=1, column=0,sticky="nsew")
+        self.pressurePlot.grid(row=1, column=0,sticky="nsew")"""
 
         
 
@@ -242,31 +244,56 @@ class AppPanel():
         self.saveButton = tk.Button(zone32,text="Save Data",fg="black",width=47,command=self.saveData)
         self.saveButton.pack(side="bottom",padx=0,ipadx=0, pady=0, ipady=0) """
         
+    """def createSerialPanel(self,parent):
+        SerialPanel(parent)"""
+
 
     def connect(self):
-        self.connectButton.config(state=tk.DISABLED)
-        self.disconnectButton.config(state=tk.NORMAL)
+        port = self.comPortSelector.get()
+        baud = int(self.comBaudSelector.get()) if type(self.comBaudSelector.get()) != int else self.comBaudSelector.get()
 
-        localPort =  self.comPortSelector.get()
-        localBaud = int(self.comBaudSelector.get())
+        self.back.serialConnect(port,baud,self.connectButton,self.disconnectButton)
 
-        print(localPort)
-        print(localBaud)
-
-        self.serial.connect(port =localPort, baudrate=localBaud)
+        self.startButton.config(state=tk.NORMAL)
+        #self.stopButton.config(state=tk.NORMAL)
+        #self.saveButton.config(state=tk.NORMAL)
         
-        self.serialConnect = True
-
-        self.connectTimeStart = time.time()
-        self.timeRefresh()
-    
     def disconnect(self):
-        self.connectButton.config(state=tk.NORMAL)
-        self.disconnectButton.config(state=tk.DISABLED)
-        self.serialConnect = False
-        self.timeRefresh()
+        self.back.serialDisconnect(self.connectButton,self.disconnectButton)
+        self.startButton.config(state=tk.DISABLED)
+        self.stopButton.config(state=tk.DISABLED)
+        self.saveButton.config(state=tk.DISABLED)
 
-    def format_seconds(self, fullseconds):
+    def startReading(self):
+        self.back.readActive = True
+        print(f"Serial lecture started")
+        self.back.initDatabase()
+        self.stopButton.config(state=tk.NORMAL)
+        self.startButton.config(state=tk.DISABLED)
+        self.master.after(10, self.readAndWrite)
+
+
+    def readAndWrite(self):
+        self.back.serialReadline()
+        self.back.updateDB()
+        self.master.after(1000, self.readAndWrite)
+
+    
+    def stopReading(self):
+        self.back.readActive = False
+        self.back.dataBuffer = None
+        print(f"Serial lecture stopped")
+        self.startButton.config(state=tk.NORMAL)
+        self.stopButton.config(state=tk.DISABLED)
+        self.saveButton.config(state=tk.NORMAL)
+
+    def saveData(self):
+        self.back.saveData()
+        self.saveButton.config(state=tk.DISABLED)
+
+
+
+    """def format_seconds(self, fullseconds):
         hours, remainder = divmod(fullseconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
@@ -291,10 +318,7 @@ class AppPanel():
         return 0
     
     def saveData(self):
-        return 0
-
-        
-
+        return 0"""
 
 def main():
     root = tk.Tk()

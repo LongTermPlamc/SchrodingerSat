@@ -39,12 +39,13 @@ class ReceiverGUI:
         
     def receive_messages(self):
         # Emulate a GUI receiving messages via serial communication
-        with serial.Serial('COM8', baudrate=9600, timeout=1) as ser:
+        with serial.Serial('COM5', baudrate=9600, timeout=1) as ser:
             while True:
                 message = ser.readline().decode().strip()
                 print(f"Received: {message}")
                 self.message_display.insert(tk.END, f"{message}\n")
                 self.message_display.see(tk.END)  # Auto-scroll to the bottom
+                time.sleep(1)
             
 
     def start(self):
