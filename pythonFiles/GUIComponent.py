@@ -2,7 +2,6 @@ from tkinter import ttk
 import tkinter as tk
 import time
 from PIL import Image, ImageTk
-from individualTkModules.SerialPanel import SerialPanel
 import backend
 import serial
 

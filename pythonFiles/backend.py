@@ -74,7 +74,7 @@ class Backend():
 
     def initDatabase(self):
         self.essayTime = time.strftime("%Y-%m-%d_%H-%M-%S")
-        self.essayName = f"C:/Users/Angel/Desktop/testserial/SchrodingerSat_{self.essayTime}.csv"
+        self.essayName = f"./SchrodingerSat_{self.essayTime}.csv"
         self.db = pd.DataFrame(columns=["time","Ax", "Ay", "Az", "Temperatura", "Presion", "Altura1", "Gx", "Gy", "Gz"])
         print(f"DB, defined with the following columns {self.db.columns} at time {self.essayTime}")
         print(self.essayName)
