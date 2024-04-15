@@ -66,7 +66,7 @@ class Backend():
         else:
             return
         
-        if type(self.db)==pd.DataFrame and len(cleanDataNmr)==len(self.db.):
+        if type(self.db)==pd.DataFrame and len(cleanDataNmr)==len(self.db.columns):
             self.db.loc[len(self.db)] = cleanDataNmr
             
     def serialWrite(self):
