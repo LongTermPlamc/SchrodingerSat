@@ -56,7 +56,7 @@ class Backend():
         if self.serial.is_open and self.readActive:
             self.dataBuffer = self.serial.readline()
             self.dataBuffer= self.dataBuffer.decode().strip()
-            print(self.dataBuffer)
+            #print(self.dataBuffer)
 
 
     def updateDB(self):

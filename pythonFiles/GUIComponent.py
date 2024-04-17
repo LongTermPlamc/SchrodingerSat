@@ -1,11 +1,13 @@
-from tkinter import ttk
+#from tkinter import ttk
 import tkinter as tk
+import ttkbootstrap as ttk
 import time
-from PIL import Image, ImageTk
 import backend
-import serial
+#import serial
 
-import SerialComponent
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 
 class AppPanel():
 
@@ -63,6 +65,17 @@ class AppPanel():
         self.stopButton.grid(row=0,column=1,sticky="nsew")
         self.saveButton = tk.Button(self.trialPanel, text="Save Data",command=self.saveData, fg="black",state = tk.DISABLED)
         self.saveButton.grid(row=2,column=0,sticky="nsew")
+
+        self.motionVarPanel = tk.Frame(self.frame,padx=5,pady=5, highlightbackground="blue", highlightthickness=2)
+        self.motionVarPanel.grid(row=0,column=1,sticky="nsew")
+        self.motionVarPanelName = tk.Label(self.motionVarPanel, text="Motion Variables")
+        self.motionVarPanelName.grid(row=0,column=0,sticky="nsew")
+        self.plotFrame = tk.Frame(self.motionVarPanel,highlightbackground="red", highlightthickness=2)
+        self.plotFrame.grid(row=1,column=0,sticky="nsew")
+        self.firstFigure, self.ax = plt.subplots()
+        self.canvas = FigureCanvasTkAgg(self.firstFigure, master=self.plotFrame)
+        self.canvas.get_tk_widget().grid(row=0,column=0,sticky="nsew")
+        self.updatePlot()
 
         """self.positionImage = Image.open(".\\pythonFiles\\wildcardImage.png").resize((780,300))
         self.positionImage = ImageTk.PhotoImage(self.positionImage)
@@ -275,7 +288,7 @@ class AppPanel():
     def readAndWrite(self):
         self.back.serialReadline()
         self.back.updateDB()
-        self.master.after(1000, self.readAndWrite)
+        self.master.after(20, self.readAndWrite)
 
     
     def stopReading(self):
@@ -289,6 +302,22 @@ class AppPanel():
     def saveData(self):
         self.back.saveData()
         self.saveButton.config(state=tk.DISABLED)
+    
+    def updatePlot(self):
+
+        if self.back.db is not None:
+            x = self.back.db.index.to_list()
+            y = self.back.db.loc[:,"time"]
+
+            self.ax.clear()
+            self.ax.plot(x, y)
+            self.ax.set_xlabel('X-axis')
+            self.ax.set_ylabel('Y-axis')
+            self.ax.set_title('Time Plot')
+
+            self.canvas.draw()
+
+        self.master.after(20, self.updatePlot)
 
 
 
