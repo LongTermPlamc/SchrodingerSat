@@ -18,7 +18,7 @@ class Backend():
 
     def __init__(self):
         self.serial = serial.Serial()
-        self.availablePorts = ["COM3","COM2","COM1","COM4","COM5","COM6"]
+        self.availablePorts = ["COM1","COM2","COM3","COM4","COM5","COM6"]
         self.availableBauds = [9600, 19200, 38400, 57600, 115200]
         #self.availablePorts  = serial.tools.list_ports.comports()
 
@@ -55,9 +55,8 @@ class Backend():
     def serialReadline(self):
         if self.serial.is_open and self.readActive:
             self.dataBuffer = self.serial.readline()
-            print(self.dataBuffer)
-            self.dataBuffer= self.dataBuffer.decode('latin1').strip()
-            print(self.dataBuffer)
+            self.dataBuffer= self.dataBuffer.decode().strip()
+            #print(self.dataBuffer)
 
 
     def updateDB(self):

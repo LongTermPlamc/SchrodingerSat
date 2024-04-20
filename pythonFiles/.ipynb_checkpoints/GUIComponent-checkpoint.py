@@ -6,7 +6,6 @@ import backend
 #import serial
 
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
@@ -21,6 +20,7 @@ class AppPanel():
 
         self.frame = tk.Frame(self.master, padx= 20, pady=20)
         self.frame.grid(row=0,column=0,sticky="nsew")
+        
 
         self.controlPanel = tk.Frame(self.frame, highlightbackground="blue", highlightthickness=2)
         self.controlPanel.grid(row=0,column = 0,sticky="nsew")
@@ -30,7 +30,7 @@ class AppPanel():
         self.connectionPanelName = tk.Label(self.connectionPanel, text="Serial Connection Panel")
         self.connectionPanelName.grid(row=0,column=0,sticky="nsew")
         self.comPortSelector = ttk.Combobox(self.connectionPanel,state="readonly", values=self.back.availablePorts)
-        self.comPortSelector.current(0)
+        self.comPortSelector.current(4)
         self.comPortSelector.grid(row=1,column=0,sticky="nsew")
         self.comBaudSelector = ttk.Combobox(self.connectionPanel, state="readonly",values=self.back.availableBauds)
         self.comBaudSelector.current(0)
@@ -68,25 +68,13 @@ class AppPanel():
 
         self.motionVarPanel = tk.Frame(self.frame,padx=5,pady=5, highlightbackground="blue", highlightthickness=2)
         self.motionVarPanel.grid(row=0,column=1,sticky="nsew")
-        #PanelLabel
         self.motionVarPanelName = tk.Label(self.motionVarPanel, text="Motion Variables")
         self.motionVarPanelName.grid(row=0,column=0,sticky="nsew")
-        #FirstFigureFrame
         self.plotFrame = tk.Frame(self.motionVarPanel,highlightbackground="red", highlightthickness=2)
         self.plotFrame.grid(row=1,column=0,sticky="nsew")
-        #FirstFigure
-        self.firstFigure, self.ax1 = plt.subplots(figsize=(4, 3))
-        self.canvas1 = FigureCanvasTkAgg(self.firstFigure, master=self.plotFrame)
-        self.canvas1.get_tk_widget().grid(row=0,column=0,sticky="nsew")
-        self.motionVarPanelName = tk.Label(self.motionVarPanel, text="Motion Variables")
-        self.motionVarPanelName.grid(row=0,column=0,sticky="nsew")
-        #SecondFigure
-        self.plotFrame2 = tk.Frame(self.motionVarPanel,highlightbackground="red", highlightthickness=2)
-        self.plotFrame2.grid(row=1,column=1,sticky="nsew")
-        self.secondFigure, self.ax2 = plt.subplots(figsize=(4,3))
-        self.canvas2 = FigureCanvasTkAgg(self.secondFigure, master=self.plotFrame2)
-        self.canvas2.get_tk_widget().grid(row=0,column=0,sticky="nsew")
-        #UpdatePlotFunction
+        self.firstFigure, self.ax = plt.subplots()
+        self.canvas = FigureCanvasTkAgg(self.firstFigure, master=self.plotFrame)
+        self.canvas.get_tk_widget().grid(row=0,column=0,sticky="nsew")
         self.updatePlot()
 
         """self.positionImage = Image.open(".\\pythonFiles\\wildcardImage.png").resize((780,300))
@@ -319,24 +307,15 @@ class AppPanel():
 
         if self.back.db is not None:
             x = self.back.db.index.to_list()
-            y1 = self.back.db.loc[:,"time"]
-            y2 = self.back.db.loc[:,"Ax"]
+            y = self.back.db.loc[:,"time"]
 
-            self.ax1.clear()
-            self.ax1.plot(x, y1)
-            self.ax1.set_xlabel('X-axis')
-            self.ax1.set_ylabel('Y-axis')
-            self.ax1.set_title('Time Plot')
+            self.ax.clear()
+            self.ax.plot(x, y)
+            self.ax.set_xlabel('X-axis')
+            self.ax.set_ylabel('Y-axis')
+            self.ax.set_title('Time Plot')
 
-            self.canvas1.draw()
-            
-            self.ax2.clear()
-            self.ax2.plot(x, y2)
-            self.ax2.set_xlabel('X-axis')
-            self.ax2.set_ylabel('Y-axis')
-            self.ax2.set_title('Aceleration Plot')
-
-            self.canvas2.draw()
+            self.canvas.draw()
 
         self.master.after(20, self.updatePlot)
 
